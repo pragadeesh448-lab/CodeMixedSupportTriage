@@ -8,7 +8,10 @@ HIGH_PAYMENT_PATTERNS = [
     r"\bcharged twice\b",
     r"\bdouble debit\b",
     r"\bdouble charge\b",
-    r"payment failed.{0,60}(money|amount|paise|paisa).{0,30}(deducted|debited|cut)",
+    r"payment failed.{0,60}(money|amount|paise|paisa).{0,30}(deduct\\w*|debit\\w*|cut|kat)",
+    r"charged an extra fee",
+    r"charged extra",
+    r"extra fee",
     r"(money|amount).{0,30}(deducted|debited) twice",
     r"paise kat gaye",
     r"paise kat gaye lekin",
@@ -90,7 +93,7 @@ def predict_rule_urgency(message, predicted_intent, urgency_model, urgency_encod
         return "low"
 
     # Ordinary refund/return/cancellation requests default to medium.
-    if predicted_intent in {"return_request", "order_cancellation", "refund_request"}:
+    if predicted_intent in {"return_request", "order_cancellation", "refund_request", "payment_issue", "account_support"}:
         return "medium"
 
     # Unclear delivery and other unmatched messages retain the ML estimate.

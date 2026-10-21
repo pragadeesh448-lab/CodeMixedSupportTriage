@@ -43,6 +43,7 @@ python -m streamlit run app.py
 After training, run:
 ```powershell
 python evaluate_model.py
+python -m unittest discover -s tests
 ```
 
 The evaluator prints ML-only intent/urgency accuracy and a separate rule-assisted urgency accuracy, then saves per-message predictions to `evaluation_results.csv`. The results file is generated locally and should be reviewed before sharing.
@@ -58,4 +59,4 @@ The evaluator prints ML-only intent/urgency accuracy and a separate rule-assiste
 
 ## Urgency evaluation notes
 
-The evaluator reports the raw ML urgency estimate separately from the rule-assisted final urgency, using the same shared rules as the app. This distinction matters because the probability/confidence displayed in the UI still comes from the ML model and is not a calibrated confidence score for a rule override. Review each misclassified row and keep test labels independent of model changes; do not change test labels just to raise the score.
+The evaluator reports the raw ML urgency estimate separately from the rule-assisted final urgency, using the same shared rules as the app. The small unit-test suite checks high-risk payment/refund/account signals, routine low-urgency requests, and ambiguous delivery review. This distinction matters because the probability/confidence displayed in the UI still comes from the ML model and is not a calibrated confidence score for a rule override. Review each misclassified row and keep test labels independent of model changes; do not change test labels just to raise the score.
