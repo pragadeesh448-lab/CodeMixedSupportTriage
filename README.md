@@ -60,3 +60,8 @@ The evaluator prints ML-only intent/urgency accuracy and a separate rule-assiste
 ## Urgency evaluation notes
 
 The evaluator reports the raw ML urgency estimate separately from the rule-assisted final urgency, using the same shared rules as the app. The small unit-test suite checks high-risk payment/refund/account signals, routine low-urgency requests, and ambiguous delivery review. This distinction matters because the probability/confidence displayed in the UI still comes from the ML model and is not a calibrated confidence score for a rule override. Review each misclassified row and keep test labels independent of model changes; do not change test labels just to raise the score.
+
+
+## Baseline evaluation snapshot
+
+A local run of the current code and 30-row hold-out CSV reported **86.67% intent accuracy**, **26.67% ML-only urgency accuracy**, and **70.00% rule-assisted urgency accuracy**. This is one small prototype evaluation, not a guarantee of performance on future tickets. The rule-assisted score may be optimistic because rules were developed during iteration against these example messages; use a fresh, separately labelled test set for a less biased estimate.
