@@ -63,6 +63,53 @@ if st.button("Analyze Message", type="primary"):
         else:
             st.success("No review flag triggered by the current prototype rules")
 
+
+        
+        st.subheader("Suggested Customer Reply")
+
+        if intent == "refund_request":
+            reply = (
+                "We understand that you are waiting for your refund. "
+                "Our support team will review the transaction and "
+                "provide an update. Thank you for your patience."
+            )
+        elif intent == "delivery_issue":
+            reply = (
+                "We are sorry for the delivery delay. "
+                "Our support team will check your order status "
+                "and help you with the next steps."
+            )
+        elif intent == "payment_issue":
+            reply = (
+                "We understand your payment concern. "
+                "Please do not make another payment while we review "
+                "the transaction. Our support team will investigate."
+            )
+        elif intent == "account_support":
+            reply = (
+                "We are sorry you are having trouble with your account. "
+                "Our support team will help you resolve the issue."
+            )
+        elif intent == "order_cancellation":
+            reply = (
+                "We received your order cancellation request. "
+                "Our support team will check the order status "
+                "and confirm the next steps."
+            )
+        else:
+            reply = (
+                "Thank you for contacting support. "
+                "Our team will review your request and assist you."
+            )
+
+        st.text_area(
+            "Draft reply (review before sending)",
+            value=reply,
+            height=120
+        )
+
+
+
         st.caption(
             "Prototype only: confidence scores are not validated "
             "reliability measures. Review urgent messages carefully."
