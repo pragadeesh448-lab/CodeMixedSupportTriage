@@ -1,0 +1,21 @@
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Model artifacts
+*.pkl
+*.joblib
+
+# Editor and OS
+.vscode/
+.DS_Store
+Thumbs.db
