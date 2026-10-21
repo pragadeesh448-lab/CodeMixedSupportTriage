@@ -1,7 +1,7 @@
 
 import streamlit as st
 import joblib
-import re
+from triage_rules import predict_rule_urgency, is_ambiguous_delivery
 
 st.set_page_config(
     page_title="Code-Mixed Support Triage",
@@ -14,100 +14,6 @@ intent_model = joblib.load("intent_model.joblib")
 urgency_model = joblib.load("urgency_model.joblib")
 intent_encoder = joblib.load("intent_encoder.joblib")
 urgency_encoder = joblib.load("urgency_encoder.joblib")
-
-
-def predict_rule_urgency(message, predicted_intent):
-    text = message.lower()
-    text = re.sub(r"\s+", " ", text).strip()
-
-    # High urgency: serious payment issues
-    high_payment_patterns = [
-        "deducted twice",
-        "charged twice",
-        "double debit",
-        "payment failed but",
-        "payment failed and",
-        "money was deducted",
-        "amount was deducted",
-        "paise kat gaye",
-        "paise kat gaye lekin",
-        "rendu thadava debit",
-        "extra money deduct",
-        "extra amount cut",
-        "amount debit aagiduchu",
-        "amount was debited",
-    ]
-
-    # High urgency: explicit delays
-    high_delay_patterns = [
-        "3 days late",
-        "3 days ah varala",
-        "three days late",
-        "teen din se nahi aaya",
-        "romba late",
-        "bahut late",
-        "romba naal aachu",
-        "refund innum varala",
-        "refund abhi tak nahi aaya",
-        "refund nahi mila",
-        "refund amount urgent",
-        "refund urgent",
-    ]
-
-    # High urgency: blocked accounts
-    high_account_patterns = [
-        "account locked",
-        "account lock",
-        "account is blocked",
-        "access is blocked",
-        "account lock ho gaya",
-        "account access is blocked",
-    ]
-
-    if any(pattern in text for pattern in high_payment_patterns):
-        return "high"
-
-    if any(pattern in text for pattern in high_delay_patterns):
-        return "high"
-
-    if any(pattern in text for pattern in high_account_patterns):
-        return "high"
-
-    # Low urgency: routine enquiries and account help
-    low_patterns = [
-        "password reset",
-        "password marandhuten",
-        "password bhool gaya",
-        "forgot my password",
-        "forgot password",
-        "help me sign in",
-        "help me login",
-        "sign in to my account",
-        "refund status",
-        "refund process status",
-        "refund status check",
-        "status check",
-        "status update",
-        "where is my delivery",
-        "order tracking status",
-        "order ka track",
-    ]
-
-    if any(pattern in text for pattern in low_patterns):
-        return "low"
-
-    # Routine return, cancellation, and refund requests
-    if predicted_intent in [
-        "return_request",
-        "order_cancellation",
-        "refund_request",
-    ]:
-        return "medium"
-
-    # Use ML estimate for other messages
-    probabilities = urgency_model.predict_proba([message])[0]
-    index = probabilities.argmax()
-    return urgency_encoder.inverse_transform([index])[0]
 
 
 def get_suggested_reply(intent):
@@ -187,25 +93,9 @@ if st.button("Analyze Message", type="primary"):
         urgency_conf = float(urgency_probs[urgency_index])
 
         # Apply rules to produce the final urgency estimate
-        urgency = predict_rule_urgency(message, intent)
+        urgency = predict_rule_urgency(message, intent, urgency_model, urgency_encoder)
 
-        text = message.lower()
-
-        # Ambiguous delivery messages need human review
-        explicit_delay = any(term in text for term in [
-            "3 days",
-            "three days",
-            "teen din",
-            "romba late",
-            "bahut late",
-            "romba naal",
-        ])
-
-        ambiguous_delivery = (
-            intent == "delivery_issue"
-            and not explicit_delay
-            and urgency != "high"
-        )
+        ambiguous_delivery = is_ambiguous_delivery(message, intent) and urgency != "high"
 
         human_review = (
             intent_conf < 0.60
