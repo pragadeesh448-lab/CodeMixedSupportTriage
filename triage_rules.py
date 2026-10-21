@@ -8,7 +8,7 @@ HIGH_PAYMENT_PATTERNS = [
     r"\bcharged twice\b",
     r"\bdouble debit\b",
     r"\bdouble charge\b",
-    r"payment failed.{0,60}(money|amount|paise|paisa).{0,30}(deduct\\w*|debit\\w*|cut|kat)",
+    r"payment failed.{0,60}(money|amount|paise|paisa).{0,30}(deduct\w*|debit\w*|cut|kat)",
     r"charged an extra fee",
     r"charged extra",
     r"extra fee",
