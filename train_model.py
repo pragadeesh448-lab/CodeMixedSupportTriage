@@ -25,14 +25,39 @@ y_urgency = urgency_encoder.fit_transform(data["urgency"])
 
 # Build intent classification model
 intent_model = Pipeline([
-    ("tfidf", TfidfVectorizer(ngram_range=(1, 2), strip_accents="unicode")),
-    ("classifier", CalibratedClassifierCV(LinearSVC(), cv=2))
+    (
+        "tfidf",
+        TfidfVectorizer(
+            ngram_range=(1, 2),
+            strip_accents="unicode"
+        )
+    ),
+    (
+        "classifier",
+        CalibratedClassifierCV(
+            LinearSVC(),
+            cv=2
+        )
+    )
 ])
+
 
 # Build urgency classification model
 urgency_model = Pipeline([
-    ("tfidf", TfidfVectorizer(ngram_range=(1, 2), strip_accents="unicode")),
-    ("classifier", CalibratedClassifierCV(LinearSVC(), cv=2))
+    (
+        "tfidf",
+        TfidfVectorizer(
+            ngram_range=(1, 2),
+            strip_accents="unicode"
+        )
+    ),
+    (
+        "classifier",
+        CalibratedClassifierCV(
+            LinearSVC(class_weight="balanced"),
+            cv=2
+        )
+    )
 ])
 
 
@@ -46,6 +71,7 @@ joblib.dump(intent_model, "intent_model.joblib")
 joblib.dump(urgency_model, "urgency_model.joblib")
 joblib.dump(intent_encoder, "intent_encoder.joblib")
 joblib.dump(urgency_encoder, "urgency_encoder.joblib")
+
 
 print("Training completed successfully!")
 print("Training messages:", len(data))
