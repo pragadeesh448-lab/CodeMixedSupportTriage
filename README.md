@@ -10,8 +10,9 @@ A prototype customer-support triage app for messages written in Tanglish, Hingli
 
 - `app.py` — Streamlit dashboard, intent model, urgency rules, review flag and suggested reply.
 - `train_model.py` — trains the TF-IDF / calibrated LinearSVC intent and urgency models.
+- `triage_rules.py` — shared rule-based urgency and ambiguous-delivery review logic used by the dashboard, smoke tests, and evaluation.
 - `test_model.py` — runs representative messages through the triage pipeline.
-- `evaluate_model.py` — evaluates ML-only predictions and rule-assisted triage separately on the held-out test CSV.
+- `evaluate_model.py` — reports ML-only and rule-assisted metrics separately on the held-out test CSV.
 - `data/support_tickets.csv` — 70 labelled training examples.
 - `data/test_cases.csv` — 30 labelled evaluation examples.
 
@@ -53,3 +54,8 @@ The evaluator prints ML-only intent/urgency accuracy and a separate rule-assiste
 - The 30 held-out examples currently cover delivery, refund, payment, and account support; they do not test every intent class.
 - Rule-assisted metrics can look better or worse depending on labelled examples. Do not treat rules as proof of generalization; inspect per-class reports and incorrect predictions.
 - Suggested replies are drafts. A support agent must review them before sending.
+
+
+## Urgency evaluation notes
+
+The evaluator reports the raw ML urgency estimate separately from the rule-assisted final urgency, using the same shared rules as the app. This distinction matters because the probability/confidence displayed in the UI still comes from the ML model and is not a calibrated confidence score for a rule override. Review each misclassified row and keep test labels independent of model changes; do not change test labels just to raise the score.
