@@ -1,3 +1,6 @@
+import os
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+
 import pandas as pd
 import joblib
 from sklearn.metrics import accuracy_score, classification_report
