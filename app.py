@@ -1,6 +1,101 @@
 import streamlit as st
 import joblib
+import re
 from triage_rules import predict_rule_urgency, is_ambiguous_delivery
+
+
+# Explicit intent rules for clear customer actions. The ML model remains the fallback.
+# These rules separate exchange, return, refund, inquiry, and complaint requests.
+INTENT_RULES = [
+    (
+        "product_exchange",
+        [
+            r"\b(exchange|replace|replacement)\b",
+            r"\b(exchange|replace)\s+(it|this|the product|the item|my product|my item)\b",
+            r"\b(product|item|dress|shoe|phone).{0,35}\b(exchange|replace)\b",
+            r"\b(change|swap)\s+(this|it|the product|the size)\b",
+            r"\b(exchange|replace)\s+ pannanum\b",
+            r"\bexchange pannanum\b",
+            r"\breplace pannanum\b",
+            r"\bsize change pannanum\b",
+            r"\bexchange karna hai\b",
+            r"\breplace karna hai\b",
+        ],
+    ),
+    (
+        "refund_request",
+        [
+            r"\b(refund|money back|give my money back)\b",
+            r"\brefund venum\b",
+            r"\brefund kudu\b",
+            r"\brefund pannunga\b",
+            r"\bpaise wapas\b",
+            r"\bmujhe refund chahiye\b",
+            r"\brefund chahiye\b",
+        ],
+    ),
+    (
+        "return_request",
+        [
+            r"\b(return|send it back|send this back)\b",
+            r"\breturn pannanum\b",
+            r"\breturn pannunga\b",
+            r"\bwapas karna hai\b",
+            r"\bitem wapas\b",
+        ],
+    ),
+    (
+        "product_inquiry",
+        [
+            r"\b(product details|product information|specifications|features of)\b",
+            r"\b(available|availability|in stock|price of|cost of)\b.{0,40}\b(product|item|phone|laptop|shoe|dress)\b",
+            r"\b(product|item|phone|laptop|shoe|dress)\b.{0,40}\b(price|cost|details|features|available|availability)\b",
+            r"\bdetails sollunga\b",
+            r"\bprice enna\b",
+            r"\bavailable ah\b",
+            r"\bkitne ka hai\b",
+            r"\bdetails batao\b",
+        ],
+    ),
+    (
+        "product_complaint",
+        [
+            r"\b(damaged|broken|defective|faulty|wrong item|wrong product|poor quality)\b",
+            # Missing accessories or incomplete product package
+            r"\b(missing|missed|not included|not provided|left out)\b.{0,45}\b(charger|charger wire|charging cable|cable|wire|accessory|accessories|parts|component|components)\b",
+            r"\b(charger|charger wire|charging cable|cable|wire|accessory|accessories|parts|component|components)\b.{0,45}\b(missing|missed|not included|not provided|left out)\b",
+            r"\b(product|package|box|parcel|order).{0,35}\b(incomplete|items missing|parts missing)\b",
+            r"\b(charger|charger wire|charging cable|wire|cable) miss aagudhu\b",
+            r"\b(charger|charger wire|charging cable|wire|cable) missing ah irukku\b",
+            r"\b(charger|charger wire|charging cable|wire|cable) varala\b",
+            r"\b(accessory|accessories|parts) missing\b",
+
+            r"\b(product|item).{0,35}\b(not working|damaged|broken|defective|wrong)\b",
+            r"\bdamage aagiduchu\b",
+            r"\bdamage ah vandhu(rukku|irukku)\b",
+            r"\bwrong product vandhu(rukku|irukku)\b",
+            r"\bproduct maathi vandhu(rukku|irukku)\b",
+            r"\b(product|item) maathi vandhu(rukku|irukku)\b",
+            r"\b(product|item) (seri illa|sari illa|correct illa|vera vandhuruku|vera vandhirukku)\b",
+            r"\b(item|product) seri ill(a|ada|ai|ai da|ai nga)\b",
+            r"\b(item|product) sari ill(a|ada|ai|ai da|ai nga)\b",
+            r"\bmacha item seri illa(da)?\b",
+            r"\bproduct work aagala\b",
+            r"\bkharab product\b",
+            r"\bgalat product aaya\b",
+            r"\bwrong item received\b",
+        ],
+    ),
+]
+
+
+def detect_rule_intent(message):
+    """Return (intent, rule_name) when a clear intent phrase matches; otherwise (None, None)."""
+    text = re.sub(r"\s+", " ", str(message).lower()).strip()
+    for intent_name, patterns in INTENT_RULES:
+        if any(re.search(pattern, text) for pattern in patterns):
+            return intent_name, "Rule override"
+    return None, None
 
 st.set_page_config(
     page_title="SupportIQ · Code-Mixed Triage",
@@ -68,6 +163,8 @@ intent_model, urgency_model, intent_encoder, urgency_encoder = load_models()
 
 def get_suggested_reply(intent):
     replies = {
+        "product_inquiry": "Thanks for your interest. Our support team can help confirm the product details, price, and availability.",
+        "product_exchange": "We can help with your product exchange. Our support team will check the item and exchange eligibility, then guide you through the next steps.",
         "refund_request": "We understand that you are waiting for your refund. Our support team will review the transaction and provide an update. Thank you for your patience.",
         "delivery_issue": "We are sorry for the delivery delay. Our support team will check your order status and help you with the next steps.",
         "payment_issue": "We understand your payment concern. Please do not make another payment while we review the transaction. Our support team will investigate.",
@@ -125,6 +222,10 @@ left, right = st.columns([1.12, 0.88], gap="large")
 with left:
     st.markdown('<div class="section-title">Analyze a customer message</div>', unsafe_allow_html=True)
     st.markdown('<div class="section-sub">Paste the message as the customer wrote it — including mixed-language words.</div>', unsafe_allow_html=True)
+
+    def set_sample(text):
+        st.session_state["customer_message"] = text
+
     with st.container(border=True):
         message = st.text_area(
             "Customer message",
@@ -135,17 +236,26 @@ with left:
         )
         sample_cols = st.columns([1, 1, 1])
         with sample_cols[0]:
-            if st.button("Try Tanglish sample", use_container_width=True):
-                st.session_state["customer_message"] = "Bro en order innum deliver aagala"
-                st.rerun()
+            st.button(
+                "Try Tanglish sample",
+                use_container_width=True,
+                on_click=set_sample,
+                args=("Bro en order innum deliver aagala",),
+            )
         with sample_cols[1]:
-            if st.button("Try refund sample", use_container_width=True):
-                st.session_state["customer_message"] = "My refund innum varala, please help"
-                st.rerun()
+            st.button(
+                "Try refund sample",
+                use_container_width=True,
+                on_click=set_sample,
+                args=("My refund innum varala, please help",),
+            )
         with sample_cols[2]:
-            if st.button("Try payment sample", use_container_width=True):
-                st.session_state["customer_message"] = "Amount debit aachu but order confirm aagala"
-                st.rerun()
+            st.button(
+                "Try payment sample",
+                use_container_width=True,
+                on_click=set_sample,
+                args=("Amount debit aachu but order confirm aagala",),
+            )
         analyze = st.button("✦  Analyze message", type="primary", use_container_width=True)
 
 with right:
@@ -175,8 +285,17 @@ if analyze:
     else:
         intent_probs = intent_model.predict_proba([message])[0]
         intent_index = intent_probs.argmax()
-        intent = intent_encoder.inverse_transform([intent_index])[0]
-        intent_conf = float(intent_probs[intent_index])
+        ml_intent = intent_encoder.inverse_transform([intent_index])[0]
+        ml_intent_conf = float(intent_probs[intent_index])
+
+        rule_intent, intent_source = detect_rule_intent(message)
+        if rule_intent:
+            intent = rule_intent
+            intent_conf = ml_intent_conf  # ML score is shown separately; it is not a confidence for the rule.
+        else:
+            intent = ml_intent
+            intent_conf = ml_intent_conf
+            intent_source = "ML model"
 
         urgency_probs = urgency_model.predict_proba([message])[0]
         urgency_index = urgency_probs.argmax()
@@ -185,28 +304,55 @@ if analyze:
 
         urgency = predict_rule_urgency(message, intent, urgency_model, urgency_encoder)
         ambiguous_delivery = is_ambiguous_delivery(message, intent) and urgency != "high"
-        human_review = (
-            intent_conf < 0.60
-            or urgency_conf < 0.60
-            or urgency == "high"
-            or ambiguous_delivery
-        )
+
+        # Explain exactly why this message is flagged for human review.
+        review_reasons = []
+
+        if intent_conf < 0.60:
+            review_reasons.append("Intent prediction confidence is low.")
+
+        if urgency_conf < 0.60:
+            review_reasons.append("Urgency prediction confidence is low.")
+
+        if urgency == "high":
+            review_reasons.append("High urgency detected; human review is recommended.")
+
+        if ambiguous_delivery:
+            review_reasons.append("Delivery issue detected, but the delay duration is unclear.")
+
+        human_review = bool(review_reasons)
 
         st.markdown("---")
         st.markdown('<div class="section-title">Triage results</div>', unsafe_allow_html=True)
         st.markdown('<div class="section-sub">Predictions for this message. Confidence is a model score, not a guarantee of correctness.</div>', unsafe_allow_html=True)
+        if intent_source == "Rule override":
+            st.caption("Intent matched by a phrase rule. Check the wording if the label does not fit the customer's meaning.")
 
         c1, c2, c3 = st.columns(3)
-        c1.markdown(f'<div class="result-card"><div class="result-label">DETECTED INTENT</div><div class="result-value">{pretty_label(intent)}</div><span class="badge badge-blue">{intent_conf:.0%} model score</span></div>', unsafe_allow_html=True)
+        intent_badge = (
+            '<span class="badge badge-green">Rule-based match</span>'
+            if intent_source == "Rule override"
+            else f'<span class="badge badge-blue">{intent_conf:.0%} model score</span>'
+        )
+        c1.markdown(
+            f'<div class="result-card"><div class="result-label">DETECTED INTENT</div>'
+            f'<div class="result-value">{pretty_label(intent)}</div>{intent_badge}</div>',
+            unsafe_allow_html=True,
+        )
         urgency_class = "badge-red" if urgency == "high" else ("badge-green" if urgency == "low" else "badge-blue")
         c2.markdown(f'<div class="result-card"><div class="result-label">FINAL URGENCY ESTIMATE</div><div class="result-value">{pretty_label(urgency)}</div><span class="badge {urgency_class}">Rule-assisted estimate</span></div>', unsafe_allow_html=True)
         c3.markdown(f'<div class="result-card"><div class="result-label">ML-ONLY URGENCY</div><div class="result-value">{pretty_label(ml_urgency)}</div><span class="badge badge-blue">{urgency_conf:.0%} model score</span></div>', unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
         if human_review:
-            st.warning("Human review recommended — this message may be urgent, ambiguous, or have a lower model score.")
+            st.warning("Human review recommended.")
+            for reason in review_reasons:
+                st.write(f"- {reason}")
         else:
-            st.info("No review flag was triggered by the current prototype rules. An agent should still verify the result.")
+            st.info(
+                "No review flag was triggered by the current prototype rules. "
+                "An agent should still verify the result."
+            )
 
         st.markdown('<div class="section-title">Suggested customer reply</div>', unsafe_allow_html=True)
         st.markdown('<div class="section-sub">Review and edit this draft before sending it to a customer.</div>', unsafe_allow_html=True)
