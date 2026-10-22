@@ -1,0 +1,33 @@
+message,expected_intent,expected_urgency
+"order vandhuchu but box damaged, refund venum",refund_request,medium
+enakku refund venum,refund_request,medium
+paise wapas chahiye,refund_request,medium
+"please return my money, payment debited twice",refund_request,medium
+product return pannanum,return_request,medium
+I want to return this item,return_request,medium
+wrong product vandhurukku return pannanum,return_request,medium
+mujhe ye item wapas karna hai,return_request,medium
+product exchange pannanum,product_exchange,medium
+"size correct illa, exchange venum",product_exchange,medium
+I want to exchange this phone,product_exchange,medium
+mujhe product exchange karna hai,product_exchange,medium
+charger wire miss aagudhu,product_complaint,medium
+product nalla illa da,product_complaint,medium
+product kaanom da,product_complaint,medium
+The item arrived broken,product_complaint,medium
+box damaged ah vandhurukku,product_complaint,medium
+product romba nalla irukku,positive_feedback,low
+"Thank you, service was excellent",positive_feedback,low
+product bahut accha hai,positive_feedback,low
+order innum deliver aagala,delivery_issue,medium
+my order has not arrived yet,delivery_issue,medium
+parcel abhi tak nahi aaya,delivery_issue,medium
+"delivery late aagudhu, three days aachu",delivery_issue,high
+amount debit aachu but order confirm aagala,payment_issue,medium
+payment failed but money deducted,payment_issue,medium
+paise kat gaye lekin order confirm nahi hua,payment_issue,medium
+login panna mudiyala,account_support,medium
+I cannot log into my account,account_support,medium
+mera password reset nahi ho raha,account_support,medium
+order cancel pannanum,order_cancellation,medium
+please cancel my order,order_cancellation,medium

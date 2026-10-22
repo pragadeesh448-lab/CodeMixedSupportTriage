@@ -1,241 +1,296 @@
 message,intent,urgency
-"Bro en order innum deliver aagala","delivery_issue","medium"
-"En parcel innum varala, tracking update sollunga","delivery_issue","high"
-"Order late aagudhu, help pannunga","delivery_issue","medium"
-"Courier innum veetuku varala","delivery_issue","medium"
-"En shipment eppo reach aagum","delivery_issue","high"
-"Delivery date mudinjiduchu, parcel varala","delivery_issue","high"
-"Order status update pannunga please","delivery_issue","medium"
-"Parcel three days ah stuck ah irukku","delivery_issue","high"
-"Delivery agent call pannala","delivery_issue","medium"
-"En order enga irukku nu check pannunga","delivery_issue","medium"
-"Mera order abhi tak deliver nahi hua","delivery_issue","medium"
-"Mera parcel abhi tak nahi aaya","delivery_issue","high"
-"Delivery bahut late ho rahi hai","delivery_issue","medium"
-"Courier ghar par nahi aaya","delivery_issue","medium"
-"Mera shipment kab pahunchega","delivery_issue","high"
-"Delivery date nikal gayi, parcel nahi mila","delivery_issue","high"
-"Order ka status batao please","delivery_issue","medium"
-"Parcel teen din se stuck hai","delivery_issue","high"
-"Delivery agent ne call nahi kiya","delivery_issue","medium"
-"Mera order kahan hai check karo","delivery_issue","medium"
-"My order has not arrived yet","delivery_issue","medium"
-"My parcel is still missing","delivery_issue","high"
-"The delivery is very late","delivery_issue","medium"
-"The courier has not arrived","delivery_issue","medium"
-"When will my shipment arrive","delivery_issue","high"
-"The promised delivery date has passed","delivery_issue","high"
-"Please update my order status","delivery_issue","medium"
-"My parcel has been stuck for three days","delivery_issue","high"
-"The delivery agent did not call","delivery_issue","medium"
-"Please check where my order is","delivery_issue","medium"
-"Bro refund innum varala","refund_request","medium"
-"En money eppo thirumba varum","refund_request","medium"
-"Refund approve aachu but amount credit aagala","refund_request","high"
-"Refund status check pannunga","refund_request","medium"
-"En panatha thirupi kudunga","refund_request","medium"
-"Refund process romba late aagudhu","refund_request","high"
-"Return panniten, refund venum","refund_request","medium"
-"Refund amount bank la varala","refund_request","high"
-"Refund update sollunga please","refund_request","medium"
-"En refund pending la irukku","refund_request","high"
-"Mera refund abhi tak nahi aaya","refund_request","medium"
-"Mere paise kab wapas milenge","refund_request","medium"
-"Refund approve hua par paise credit nahi hue","refund_request","high"
-"Refund ka status check karo","refund_request","medium"
-"Mere paise wapas kar do","refund_request","medium"
-"Refund process bahut late hai","refund_request","high"
-"Product return kiya, refund chahiye","refund_request","medium"
-"Refund amount bank mein nahi aaya","refund_request","high"
-"Refund ka update batao please","refund_request","medium"
-"Mera refund pending hai","refund_request","high"
-"My refund has not arrived","refund_request","medium"
-"When will I get my money back","refund_request","medium"
-"My approved refund was not credited","refund_request","high"
-"Please check my refund status","refund_request","medium"
-"Please return my money","refund_request","medium"
-"The refund is taking too long","refund_request","high"
-"I returned the product and need a refund","refund_request","medium"
-"The refund amount is missing from my bank","refund_request","high"
-"Please give me a refund update","refund_request","medium"
-"My refund is still pending","refund_request","high"
-"Amount debit aachu but order confirm aagala","payment_issue","high"
-"Payment rendu thadava cut aagiduchu","payment_issue","high"
-"En payment fail aachu aana money poiduchu","payment_issue","high"
-"UPI payment success but order illa","payment_issue","high"
-"Card la amount deduct aachu","payment_issue","high"
-"Payment pending la stuck aagudhu","payment_issue","high"
-"Wrong amount debit pannitaanga","payment_issue","high"
-"Payment panna error varudhu","payment_issue","high"
-"Money debit aachu receipt varala","payment_issue","high"
-"En account la double charge irukku","payment_issue","high"
-"Paise kat gaye lekin order confirm nahi hua","payment_issue","high"
-"Payment do baar cut gaya","payment_issue","high"
-"Payment fail hua par paise kat gaye","payment_issue","high"
-"UPI successful hai par order nahi bana","payment_issue","high"
-"Card se amount deduct ho gaya","payment_issue","high"
-"Payment pending mein atka hai","payment_issue","high"
-"Galat amount debit hua","payment_issue","high"
-"Payment karte waqt error aa raha hai","payment_issue","high"
-"Paise kat gaye par receipt nahi mili","payment_issue","high"
-"Mere account se double charge hua","payment_issue","high"
-"The amount was debited but my order was not confirmed","payment_issue","high"
-"I was charged twice","payment_issue","high"
-"Payment failed but money was deducted","payment_issue","high"
-"UPI succeeded but no order was created","payment_issue","high"
-"The amount was deducted from my card","payment_issue","high"
-"My payment is stuck as pending","payment_issue","high"
-"I was charged the wrong amount","payment_issue","high"
-"I get an error when paying","payment_issue","high"
-"Money was deducted but I got no receipt","payment_issue","high"
-"There is a duplicate charge on my account","payment_issue","high"
-"En account login aagala","account_support","medium"
-"Password reset panna help venum","account_support","medium"
-"En account lock aagiduchu","account_support","high"
-"OTP varala login panna mudiyala","account_support","medium"
-"Email change panna help pannunga","account_support","medium"
-"Account access kidaikala","account_support","medium"
-"Password marandhuten","account_support","medium"
-"Profile details update pannanum","account_support","medium"
-"App enna logout panniduchu","account_support","medium"
-"En account verify aagala","account_support","medium"
-"Mera account login nahi ho raha","account_support","medium"
-"Password reset karne mein help karo","account_support","medium"
-"Mera account lock ho gaya","account_support","high"
-"Login ke liye OTP nahi aa raha","account_support","medium"
-"Email change karna hai","account_support","medium"
-"Account ka access nahi mil raha","account_support","medium"
-"Main password bhool gaya","account_support","medium"
-"Profile details update karni hain","account_support","medium"
-"App ne mujhe logout kar diya","account_support","medium"
-"Mera account verify nahi hua","account_support","medium"
-"I cannot log in to my account","account_support","medium"
-"Please help me reset my password","account_support","medium"
-"My account is locked","account_support","high"
-"I am not receiving the login OTP","account_support","medium"
-"I need to change my email address","account_support","medium"
-"I cannot access my account","account_support","medium"
-"I forgot my password","account_support","medium"
-"I need to update my profile details","account_support","medium"
-"The app logged me out","account_support","medium"
-"My account verification failed","account_support","medium"
-"En order cancel pannunga","order_cancellation","medium"
-"Order ship aagurathukku munnadi cancel pannanum","order_cancellation","medium"
-"Wrong order place panniten cancel pannunga","order_cancellation","medium"
-"Cancel request submit aagala","order_cancellation","medium"
-"En order cancel aacha","order_cancellation","medium"
-"Order cancel panna option kaanom","order_cancellation","medium"
-"Please order cancel pannidunga","order_cancellation","medium"
-"Order innum dispatch aagala cancel venum","order_cancellation","medium"
-"Accidentally order panniten cancel pannanum","order_cancellation","medium"
-"Cancellation confirm pannunga","order_cancellation","medium"
-"Mera order cancel kar do","order_cancellation","medium"
-"Ship hone se pehle order cancel karna hai","order_cancellation","medium"
-"Galat order place kiya, cancel karo","order_cancellation","medium"
-"Cancellation request submit nahi hui","order_cancellation","medium"
-"Mera order cancel hua kya","order_cancellation","medium"
-"Order cancel karne ka option nahi mil raha","order_cancellation","medium"
-"Please mera order cancel kar dijiye","order_cancellation","medium"
-"Dispatch se pehle cancel karna hai","order_cancellation","medium"
-"Galti se order ho gaya, cancel karo","order_cancellation","medium"
-"Cancellation confirm karo","order_cancellation","medium"
-"Please cancel my order","order_cancellation","medium"
-"I want to cancel before it ships","order_cancellation","medium"
-"I placed the wrong order and need to cancel","order_cancellation","medium"
-"My cancellation request did not submit","order_cancellation","medium"
-"Was my order cancelled","order_cancellation","medium"
-"I cannot find the cancel order option","order_cancellation","medium"
-"Please cancel this order for me","order_cancellation","medium"
-"I need to cancel before dispatch","order_cancellation","medium"
-"I ordered by mistake, please cancel it","order_cancellation","medium"
-"Please confirm the cancellation","order_cancellation","medium"
-"Wrong product vandhurukku return pannanum","return_request","medium"
-"Damaged item vandhurukku return epdi","return_request","high"
-"Size correct illa return venum","return_request","medium"
-"Product return process sollunga","return_request","medium"
-"Return request submit panna mudiyala","return_request","medium"
-"Box damaged ah vandhudhu return venum","return_request","high"
-"Enaku replacement illa return venum","return_request","medium"
-"Return pickup eppo varum","return_request","medium"
-"Used product vandhurukku return pannanum","return_request","medium"
-"Return eligibility check pannunga","return_request","medium"
-"Galat product mila hai, return karna hai","return_request","medium"
-"Damaged item aaya hai, return kaise karun","return_request","high"
-"Size sahi nahi hai, return chahiye","return_request","medium"
-"Product return ka process batao","return_request","medium"
-"Return request submit nahi ho rahi","return_request","medium"
-"Box damaged aaya, return chahiye","return_request","high"
-"Mujhe replacement nahi, return chahiye","return_request","medium"
-"Return pickup kab aayega","return_request","medium"
-"Used product mila hai, return karna hai","return_request","medium"
-"Return eligibility check karo","return_request","medium"
-"I received the wrong product and want to return it","return_request","medium"
-"The item arrived damaged, how do I return it","return_request","high"
-"The size is incorrect and I want a return","return_request","medium"
-"Please explain the return process","return_request","medium"
-"I cannot submit a return request","return_request","medium"
-"The box arrived damaged and I want to return it","return_request","high"
-"I prefer a return instead of a replacement","return_request","medium"
-"When will the return pickup happen","return_request","medium"
-"I received a used product and want to return it","return_request","medium"
-"Please check if this item is eligible for return","return_request","medium"
-"Dei product quality nalla iruku","positive_feedback","low"
-"Product romba nalla iruku, super quality","positive_feedback","low"
-"Semma product, quality super ah irukku","positive_feedback","low"
-"Indha product enaku romba pudichirukku","positive_feedback","low"
-"Delivery fast and product nalla iruku","positive_feedback","low"
-"Product expected ah vida better ah irukku","positive_feedback","low"
-"Quality excellent ah iruku, thanks","positive_feedback","low"
-"Super service, naan happy","positive_feedback","low"
-"Product use panna easy ah iruku","positive_feedback","low"
-"Indha purchase worth ah irundhuchu","positive_feedback","low"
-"Product bahut achha hai, quality bhi badhiya hai","positive_feedback","low"
-"Mujhe yeh product bahut pasand aaya","positive_feedback","low"
-"Quality ekdum mast hai","positive_feedback","low"
-"Product meri expectation se better hai","positive_feedback","low"
-"Delivery fast thi aur product achha hai","positive_feedback","low"
-"Bahut badhiya service, thank you","positive_feedback","low"
-"Product use karna easy hai","positive_feedback","low"
-"Is purchase se main khush hoon","positive_feedback","low"
-"Product ki finishing bahut achhi hai","positive_feedback","low"
-"Overall experience bahut accha tha","positive_feedback","low"
-"I really like this product","positive_feedback","low"
-"The product quality is excellent","positive_feedback","low"
-"This is a great product, very good quality","positive_feedback","low"
-"I am very happy with my purchase","positive_feedback","low"
-"The delivery was fast and the product is good","positive_feedback","low"
-"The product is better than expected","positive_feedback","low"
-"Excellent quality, thank you","positive_feedback","low"
-"Great service, I am satisfied","positive_feedback","low"
-"The product is easy to use","positive_feedback","low"
-"This purchase was worth it","positive_feedback","low"
-"Product quality romba mosama iruku","product_complaint","medium"
-"Product defective ah iruku help pannunga","product_complaint","high"
-"Product work aagala","product_complaint","high"
-"Quality expected madhiri illa","product_complaint","medium"
-"Item damaged ah vandhudhu","product_complaint","high"
-"Product la scratch irukku","product_complaint","medium"
-"Product romba poor quality","product_complaint","medium"
-"Received item broken ah irukku","product_complaint","high"
-"Product use pannumbodhu problem varudhu","product_complaint","medium"
-"Indha product satisfy pannala","product_complaint","medium"
-"Product ki quality bahut kharab hai","product_complaint","medium"
-"Mujhe defective product mila hai","product_complaint","high"
-"Product kaam nahi kar raha","product_complaint","high"
-"Quality expectation jaisi nahi hai","product_complaint","medium"
-"Item damaged aaya hai","product_complaint","high"
-"Product par scratch hai","product_complaint","medium"
-"Product ki quality bahut poor hai","product_complaint","medium"
-"Item toota hua mila","product_complaint","high"
-"Product use karte waqt problem aa rahi hai","product_complaint","medium"
-"Main is product se satisfied nahi hoon","product_complaint","medium"
-"The product quality is very poor","product_complaint","medium"
-"I received a defective product","product_complaint","high"
-"The product is not working","product_complaint","high"
-"The quality is below my expectations","product_complaint","medium"
-"The item arrived damaged","product_complaint","high"
-"There is a scratch on the product","product_complaint","medium"
-"This product is poor quality","product_complaint","medium"
-"The item arrived broken","product_complaint","high"
-"I have problems while using this product","product_complaint","medium"
-"I am not satisfied with this product","product_complaint","medium"
+Bro en order innum deliver aagala,delivery_issue,medium
+"En parcel innum varala, tracking update sollunga",delivery_issue,high
+"Order late aagudhu, help pannunga",delivery_issue,medium
+Courier innum veetuku varala,delivery_issue,medium
+En shipment eppo reach aagum,delivery_issue,high
+"Delivery date mudinjiduchu, parcel varala",delivery_issue,high
+Order status update pannunga please,delivery_issue,medium
+Parcel three days ah stuck ah irukku,delivery_issue,high
+Delivery agent call pannala,delivery_issue,medium
+En order enga irukku nu check pannunga,delivery_issue,medium
+Mera order abhi tak deliver nahi hua,delivery_issue,medium
+Mera parcel abhi tak nahi aaya,delivery_issue,high
+Delivery bahut late ho rahi hai,delivery_issue,medium
+Courier ghar par nahi aaya,delivery_issue,medium
+Mera shipment kab pahunchega,delivery_issue,high
+"Delivery date nikal gayi, parcel nahi mila",delivery_issue,high
+Order ka status batao please,delivery_issue,medium
+Parcel teen din se stuck hai,delivery_issue,high
+Delivery agent ne call nahi kiya,delivery_issue,medium
+Mera order kahan hai check karo,delivery_issue,medium
+My order has not arrived yet,delivery_issue,medium
+My parcel is still missing,delivery_issue,high
+The delivery is very late,delivery_issue,medium
+The courier has not arrived,delivery_issue,medium
+When will my shipment arrive,delivery_issue,high
+The promised delivery date has passed,delivery_issue,high
+Please update my order status,delivery_issue,medium
+My parcel has been stuck for three days,delivery_issue,high
+The delivery agent did not call,delivery_issue,medium
+Please check where my order is,delivery_issue,medium
+Bro refund innum varala,refund_request,medium
+En money eppo thirumba varum,refund_request,medium
+Refund approve aachu but amount credit aagala,refund_request,high
+Refund status check pannunga,refund_request,medium
+En panatha thirupi kudunga,refund_request,medium
+Refund process romba late aagudhu,refund_request,high
+"Return panniten, refund venum",refund_request,medium
+Refund amount bank la varala,refund_request,high
+Refund update sollunga please,refund_request,medium
+En refund pending la irukku,refund_request,high
+Mera refund abhi tak nahi aaya,refund_request,medium
+Mere paise kab wapas milenge,refund_request,medium
+Refund approve hua par paise credit nahi hue,refund_request,high
+Refund ka status check karo,refund_request,medium
+Mere paise wapas kar do,refund_request,medium
+Refund process bahut late hai,refund_request,high
+"Product return kiya, refund chahiye",refund_request,medium
+Refund amount bank mein nahi aaya,refund_request,high
+Refund ka update batao please,refund_request,medium
+Mera refund pending hai,refund_request,high
+My refund has not arrived,refund_request,medium
+When will I get my money back,refund_request,medium
+My approved refund was not credited,refund_request,high
+Please check my refund status,refund_request,medium
+Please return my money,refund_request,medium
+The refund is taking too long,refund_request,high
+I returned the product and need a refund,refund_request,medium
+The refund amount is missing from my bank,refund_request,high
+Please give me a refund update,refund_request,medium
+My refund is still pending,refund_request,high
+Amount debit aachu but order confirm aagala,payment_issue,high
+Payment rendu thadava cut aagiduchu,payment_issue,high
+En payment fail aachu aana money poiduchu,payment_issue,high
+UPI payment success but order illa,payment_issue,high
+Card la amount deduct aachu,payment_issue,high
+Payment pending la stuck aagudhu,payment_issue,high
+Wrong amount debit pannitaanga,payment_issue,high
+Payment panna error varudhu,payment_issue,high
+Money debit aachu receipt varala,payment_issue,high
+En account la double charge irukku,payment_issue,high
+Paise kat gaye lekin order confirm nahi hua,payment_issue,high
+Payment do baar cut gaya,payment_issue,high
+Payment fail hua par paise kat gaye,payment_issue,high
+UPI successful hai par order nahi bana,payment_issue,high
+Card se amount deduct ho gaya,payment_issue,high
+Payment pending mein atka hai,payment_issue,high
+Galat amount debit hua,payment_issue,high
+Payment karte waqt error aa raha hai,payment_issue,high
+Paise kat gaye par receipt nahi mili,payment_issue,high
+Mere account se double charge hua,payment_issue,high
+The amount was debited but my order was not confirmed,payment_issue,high
+I was charged twice,payment_issue,high
+Payment failed but money was deducted,payment_issue,high
+UPI succeeded but no order was created,payment_issue,high
+The amount was deducted from my card,payment_issue,high
+My payment is stuck as pending,payment_issue,high
+I was charged the wrong amount,payment_issue,high
+I get an error when paying,payment_issue,high
+Money was deducted but I got no receipt,payment_issue,high
+There is a duplicate charge on my account,payment_issue,high
+En account login aagala,account_support,medium
+Password reset panna help venum,account_support,medium
+En account lock aagiduchu,account_support,high
+OTP varala login panna mudiyala,account_support,medium
+Email change panna help pannunga,account_support,medium
+Account access kidaikala,account_support,medium
+Password marandhuten,account_support,medium
+Profile details update pannanum,account_support,medium
+App enna logout panniduchu,account_support,medium
+En account verify aagala,account_support,medium
+Mera account login nahi ho raha,account_support,medium
+Password reset karne mein help karo,account_support,medium
+Mera account lock ho gaya,account_support,high
+Login ke liye OTP nahi aa raha,account_support,medium
+Email change karna hai,account_support,medium
+Account ka access nahi mil raha,account_support,medium
+Main password bhool gaya,account_support,medium
+Profile details update karni hain,account_support,medium
+App ne mujhe logout kar diya,account_support,medium
+Mera account verify nahi hua,account_support,medium
+I cannot log in to my account,account_support,medium
+Please help me reset my password,account_support,medium
+My account is locked,account_support,high
+I am not receiving the login OTP,account_support,medium
+I need to change my email address,account_support,medium
+I cannot access my account,account_support,medium
+I forgot my password,account_support,medium
+I need to update my profile details,account_support,medium
+The app logged me out,account_support,medium
+My account verification failed,account_support,medium
+En order cancel pannunga,order_cancellation,medium
+Order ship aagurathukku munnadi cancel pannanum,order_cancellation,medium
+Wrong order place panniten cancel pannunga,order_cancellation,medium
+Cancel request submit aagala,order_cancellation,medium
+En order cancel aacha,order_cancellation,medium
+Order cancel panna option kaanom,order_cancellation,medium
+Please order cancel pannidunga,order_cancellation,medium
+Order innum dispatch aagala cancel venum,order_cancellation,medium
+Accidentally order panniten cancel pannanum,order_cancellation,medium
+Cancellation confirm pannunga,order_cancellation,medium
+Mera order cancel kar do,order_cancellation,medium
+Ship hone se pehle order cancel karna hai,order_cancellation,medium
+"Galat order place kiya, cancel karo",order_cancellation,medium
+Cancellation request submit nahi hui,order_cancellation,medium
+Mera order cancel hua kya,order_cancellation,medium
+Order cancel karne ka option nahi mil raha,order_cancellation,medium
+Please mera order cancel kar dijiye,order_cancellation,medium
+Dispatch se pehle cancel karna hai,order_cancellation,medium
+"Galti se order ho gaya, cancel karo",order_cancellation,medium
+Cancellation confirm karo,order_cancellation,medium
+Please cancel my order,order_cancellation,medium
+I want to cancel before it ships,order_cancellation,medium
+I placed the wrong order and need to cancel,order_cancellation,medium
+My cancellation request did not submit,order_cancellation,medium
+Was my order cancelled,order_cancellation,medium
+I cannot find the cancel order option,order_cancellation,medium
+Please cancel this order for me,order_cancellation,medium
+I need to cancel before dispatch,order_cancellation,medium
+"I ordered by mistake, please cancel it",order_cancellation,medium
+Please confirm the cancellation,order_cancellation,medium
+Wrong product vandhurukku return pannanum,return_request,medium
+Damaged item vandhurukku return epdi,return_request,high
+Size correct illa return venum,return_request,medium
+Product return process sollunga,return_request,medium
+Return request submit panna mudiyala,return_request,medium
+Box damaged ah vandhudhu return venum,return_request,high
+Enaku replacement illa return venum,return_request,medium
+Return pickup eppo varum,return_request,medium
+Used product vandhurukku return pannanum,return_request,medium
+Return eligibility check pannunga,return_request,medium
+"Galat product mila hai, return karna hai",return_request,medium
+"Damaged item aaya hai, return kaise karun",return_request,high
+"Size sahi nahi hai, return chahiye",return_request,medium
+Product return ka process batao,return_request,medium
+Return request submit nahi ho rahi,return_request,medium
+"Box damaged aaya, return chahiye",return_request,high
+"Mujhe replacement nahi, return chahiye",return_request,medium
+Return pickup kab aayega,return_request,medium
+"Used product mila hai, return karna hai",return_request,medium
+Return eligibility check karo,return_request,medium
+I received the wrong product and want to return it,return_request,medium
+"The item arrived damaged, how do I return it",return_request,high
+The size is incorrect and I want a return,return_request,medium
+Please explain the return process,return_request,medium
+I cannot submit a return request,return_request,medium
+The box arrived damaged and I want to return it,return_request,high
+I prefer a return instead of a replacement,return_request,medium
+When will the return pickup happen,return_request,medium
+I received a used product and want to return it,return_request,medium
+Please check if this item is eligible for return,return_request,medium
+Dei product quality nalla iruku,positive_feedback,low
+"Product romba nalla iruku, super quality",positive_feedback,low
+"Semma product, quality super ah irukku",positive_feedback,low
+Indha product enaku romba pudichirukku,positive_feedback,low
+Delivery fast and product nalla iruku,positive_feedback,low
+Product expected ah vida better ah irukku,positive_feedback,low
+"Quality excellent ah iruku, thanks",positive_feedback,low
+"Super service, naan happy",positive_feedback,low
+Product use panna easy ah iruku,positive_feedback,low
+Indha purchase worth ah irundhuchu,positive_feedback,low
+"Product bahut achha hai, quality bhi badhiya hai",positive_feedback,low
+Mujhe yeh product bahut pasand aaya,positive_feedback,low
+Quality ekdum mast hai,positive_feedback,low
+Product meri expectation se better hai,positive_feedback,low
+Delivery fast thi aur product achha hai,positive_feedback,low
+"Bahut badhiya service, thank you",positive_feedback,low
+Product use karna easy hai,positive_feedback,low
+Is purchase se main khush hoon,positive_feedback,low
+Product ki finishing bahut achhi hai,positive_feedback,low
+Overall experience bahut accha tha,positive_feedback,low
+I really like this product,positive_feedback,low
+The product quality is excellent,positive_feedback,low
+"This is a great product, very good quality",positive_feedback,low
+I am very happy with my purchase,positive_feedback,low
+The delivery was fast and the product is good,positive_feedback,low
+The product is better than expected,positive_feedback,low
+"Excellent quality, thank you",positive_feedback,low
+"Great service, I am satisfied",positive_feedback,low
+The product is easy to use,positive_feedback,low
+This purchase was worth it,positive_feedback,low
+Product quality romba mosama iruku,product_complaint,medium
+Product defective ah iruku help pannunga,product_complaint,high
+Product work aagala,product_complaint,high
+Quality expected madhiri illa,product_complaint,medium
+Item damaged ah vandhudhu,product_complaint,high
+Product la scratch irukku,product_complaint,medium
+Product romba poor quality,product_complaint,medium
+Received item broken ah irukku,product_complaint,high
+Product use pannumbodhu problem varudhu,product_complaint,medium
+Indha product satisfy pannala,product_complaint,medium
+Product ki quality bahut kharab hai,product_complaint,medium
+Mujhe defective product mila hai,product_complaint,high
+Product kaam nahi kar raha,product_complaint,high
+Quality expectation jaisi nahi hai,product_complaint,medium
+Item damaged aaya hai,product_complaint,high
+Product par scratch hai,product_complaint,medium
+Product ki quality bahut poor hai,product_complaint,medium
+Item toota hua mila,product_complaint,high
+Product use karte waqt problem aa rahi hai,product_complaint,medium
+Main is product se satisfied nahi hoon,product_complaint,medium
+The product quality is very poor,product_complaint,medium
+I received a defective product,product_complaint,high
+The product is not working,product_complaint,high
+The quality is below my expectations,product_complaint,medium
+The item arrived damaged,product_complaint,high
+There is a scratch on the product,product_complaint,medium
+This product is poor quality,product_complaint,medium
+The item arrived broken,product_complaint,high
+I have problems while using this product,product_complaint,medium
+I am not satisfied with this product,product_complaint,medium
+vera product vanduruku,product_complaint,medium
+vera item vandhuruku,product_complaint,medium
+wrong product vandhuruku,product_complaint,medium
+product maathi vandhuruku,product_complaint,medium
+macha item seri illada,product_complaint,medium
+I received a different product from what I ordered,product_complaint,medium
+The product delivered is not the one I ordered,product_complaint,medium
+I got the wrong model,product_complaint,medium
+product exchange pannanum,product_exchange,medium
+indha item exchange pannunga,product_exchange,medium
+wrong product vandhurukku exchange venum,product_exchange,medium
+"size correct illa, exchange pannanum",product_exchange,medium
+I want to exchange this item,product_exchange,medium
+Can you send me a replacement?,product_exchange,medium
+mujhe product exchange karna hai,product_exchange,medium
+indha product details sollunga,product_inquiry,low
+indha phone price enna,product_inquiry,low
+product stock la irukka,product_inquiry,low
+How much does this product cost?,product_inquiry,low
+is product ki details batao,product_inquiry,low
+product return pannanum,return_request,medium
+I want to return this product,return_request,medium
+enakku refund venum,refund_request,medium
+please give me a refund for this item,refund_request,medium
+paise wapas chahiye,refund_request,medium
+indha product oda price enna,product_inquiry,low
+indha item evlo cost,product_inquiry,low
+phone oda specifications sollunga,product_inquiry,low
+laptop la enna features irukku,product_inquiry,low
+indha product available ah,product_inquiry,low
+stock irukka indha model,product_inquiry,low
+vera colours available ah,product_inquiry,low
+size options enna irukku,product_inquiry,low
+product details share pannunga,product_inquiry,low
+indha phone pathi details venum,product_inquiry,low
+delivery charge evlo,product_inquiry,low
+warranty evlo years,product_inquiry,low
+does this product have a warranty,product_inquiry,low
+What is the price of this item?,product_inquiry,low
+Can you tell me more about this product?,product_inquiry,low
+Is this model currently available?,product_inquiry,low
+What colours does this phone come in?,product_inquiry,low
+Does this laptop have 16GB RAM?,product_inquiry,low
+What are the product specifications?,product_inquiry,low
+How long is the warranty period?,product_inquiry,low
+Is free delivery available?,product_inquiry,low
+mujhe is product ki price batao,product_inquiry,low
+ye item stock mein hai kya,product_inquiry,low
+is phone ke features kya hain,product_inquiry,low
+product ka warranty kitna hai,product_inquiry,low
+is product ka price kya hai,product_inquiry,low
+kya ye model available hai,product_inquiry,low
+is laptop mein kitni RAM hai,product_inquiry,low
+mujhe product ki details chahiye,product_inquiry,low
+delivery charges kitne hain,product_inquiry,low
