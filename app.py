@@ -4,6 +4,90 @@ import re
 from triage_rules import predict_rule_urgency, is_ambiguous_delivery
 
 
+import csv
+from datetime import datetime
+from pathlib import Path
+
+HISTORY_PATH = Path("data") / "triage_history.csv"
+HISTORY_FIELDS = [
+    "timestamp", "message", "intent", "urgency", "intent_confidence",
+    "urgency_confidence", "human_review", "review_reason", "language_style"
+]
+
+# Small labelled example bank for similarity-based context (not the held-out evaluation set).
+FEW_SHOT_EXAMPLES = [
+    ("charger wire miss aagudhu", "product_complaint"),
+    ("box damaged ah vandhurukku", "product_complaint"),
+    ("wrong product vandhurukku", "product_complaint"),
+    ("product exchange pannanum", "product_exchange"),
+    ("indha item exchange pannunga", "product_exchange"),
+    ("enakku refund venum", "refund_request"),
+    ("paise wapas chahiye", "refund_request"),
+    ("product return pannanum", "return_request"),
+    ("order innum deliver aagala", "delivery_issue"),
+    ("amount debit aachu but order confirm aagala", "payment_issue"),
+    ("login panna mudiyala", "account_support"),
+    ("order cancel pannanum", "order_cancellation"),
+    ("indha phone price enna", "product_inquiry"),
+    ("mujhe product ki details chahiye", "product_inquiry"),
+    ("thank you, product romba nalla irukku", "positive_feedback"),
+]
+
+
+def retrieve_similar_examples(message, top_k=3):
+    """Simple word TF-IDF cosine similarity; falls back to token overlap if sklearn is unavailable."""
+    examples = FEW_SHOT_EXAMPLES
+    try:
+        from sklearn.feature_extraction.text import TfidfVectorizer
+        from sklearn.metrics.pairwise import cosine_similarity
+        corpus = [message] + [item[0] for item in examples]
+        matrix = TfidfVectorizer(ngram_range=(1, 2), strip_accents="unicode").fit_transform(corpus)
+        scores = cosine_similarity(matrix[0:1], matrix[1:]).ravel()
+        ranked = sorted(zip(scores, examples), key=lambda pair: pair[0], reverse=True)
+        return [(phrase, label, float(score)) for score, (phrase, label) in ranked[:top_k]]
+    except Exception:
+        tokens = set(re.findall(r"\w+", message.lower()))
+        ranked = []
+        for phrase, label in examples:
+            other = set(re.findall(r"\w+", phrase.lower()))
+            score = len(tokens & other) / max(1, len(tokens | other))
+            ranked.append((phrase, label, score))
+        ranked.sort(key=lambda item: item[2], reverse=True)
+        return ranked[:top_k]
+
+
+def save_ticket(message, intent, urgency, intent_confidence, urgency_confidence,
+                human_review, review_reasons, language_style):
+    """Append one analyzed ticket to a local CSV history for the queue dashboard."""
+    HISTORY_PATH.parent.mkdir(parents=True, exist_ok=True)
+    needs_header = not HISTORY_PATH.exists() or HISTORY_PATH.stat().st_size == 0
+    with HISTORY_PATH.open("a", newline="", encoding="utf-8") as file:
+        writer = csv.DictWriter(file, fieldnames=HISTORY_FIELDS)
+        if needs_header:
+            writer.writeheader()
+        writer.writerow({
+            "timestamp": datetime.now().isoformat(timespec="seconds"),
+            "message": message,
+            "intent": intent,
+            "urgency": urgency,
+            "intent_confidence": round(float(intent_confidence), 4),
+            "urgency_confidence": round(float(urgency_confidence), 4),
+            "human_review": bool(human_review),
+            "review_reason": " ".join(review_reasons),
+            "language_style": language_style,
+        })
+
+
+def load_ticket_history():
+    if not HISTORY_PATH.exists():
+        return []
+    try:
+        with HISTORY_PATH.open("r", newline="", encoding="utf-8") as file:
+            return list(csv.DictReader(file))
+    except (OSError, csv.Error):
+        return []
+
+
 # Explicit intent rules for clear customer actions. The ML model remains the fallback.
 # These rules separate exchange, return, refund, inquiry, and complaint requests.
 INTENT_RULES = [
@@ -61,6 +145,16 @@ INTENT_RULES = [
         "product_complaint",
         [
             r"\b(damaged|broken|defective|faulty|wrong item|wrong product|poor quality)\b",
+            # Missing product or accessories, including code-mixed phrases
+            r"\b(product|item|order)\s+(kaanom|kaanom da|missing|missing ah irukku|varala)\b",
+            r"\b(product|item)\s+(nalla illa|nalla illai|sari illa|seri illa|not good|is bad|is not good)\b",
+            r"\b(product|item).{0,30}\b(kaanom|kanom|missing|miss aagudhu|miss aachu|varala)\b",
+            r"\b(charger|charger wire|charging cable|cable|wire|accessory|accessories|parts|component|components)\b.{0,35}\b(missing|missed|not included|not provided|left out|varala|miss aagudhu)\b",
+            r"\b(missing|missed|not included|not provided|left out)\b.{0,35}\b(charger|charger wire|charging cable|cable|wire|accessory|accessories|parts|component|components)\b",
+            r"\bproduct nalla illa da\b",
+            r"\bproduct kaanom da\b",
+            r"\bproduct missing ah irukku\b",
+
             # Missing accessories or incomplete product package
             r"\b(missing|missed|not included|not provided|left out)\b.{0,45}\b(charger|charger wire|charging cable|cable|wire|accessory|accessories|parts|component|components)\b",
             r"\b(charger|charger wire|charging cable|cable|wire|accessory|accessories|parts|component|components)\b.{0,45}\b(missing|missed|not included|not provided|left out)\b",
@@ -161,20 +255,76 @@ def load_models():
 intent_model, urgency_model, intent_encoder, urgency_encoder = load_models()
 
 
-def get_suggested_reply(intent):
+def detect_language_style(message):
+    """Heuristic language-style detection for reply templates; verify mixed-language cases."""
+    text = str(message).lower()
+
+    # Include common romanized Tamil/Tanglish words and colloquial verb endings.
+    tanglish_markers = [
+        r"\b(vandhuchu|vandhuch|vandhurukku|vandhirukku|varala|venum|pannanum|pannunga|pannu|aachu|aagudhu|aagala|illa|illai|irukku|enna|evlo|sollunga|kudu|bro|macha|enga|enakku|unga|da|la|ku|romba|damage ah|refund venum)\b"
+    ]
+    hinglish_markers = [
+        r"\b(mujhe|chahiye|hai|hain|nahi|nahin|karna|kya|kaise|mera|meri|mere|paise|wapas|batao|kripya|milaa|mila|hua|hui|bahut|accha|kar do|karna hai)\b"
+    ]
+
+    tanglish_score = sum(bool(re.search(pattern, text)) for pattern in tanglish_markers)
+    hinglish_score = sum(bool(re.search(pattern, text)) for pattern in hinglish_markers)
+
+    if tanglish_score > hinglish_score:
+        return "Tanglish"
+    if hinglish_score > tanglish_score:
+        return "Hinglish"
+    return "English"
+
+
+def get_suggested_reply(intent, message=""):
+    """Return a cautious reply template matching the detected language style."""
+    style = detect_language_style(message)
+
     replies = {
-        "product_inquiry": "Thanks for your interest. Our support team can help confirm the product details, price, and availability.",
-        "product_exchange": "We can help with your product exchange. Our support team will check the item and exchange eligibility, then guide you through the next steps.",
-        "refund_request": "We understand that you are waiting for your refund. Our support team will review the transaction and provide an update. Thank you for your patience.",
-        "delivery_issue": "We are sorry for the delivery delay. Our support team will check your order status and help you with the next steps.",
-        "payment_issue": "We understand your payment concern. Please do not make another payment while we review the transaction. Our support team will investigate.",
-        "account_support": "We are sorry you are having trouble with your account. Our support team will help you resolve the issue.",
-        "order_cancellation": "We received your order cancellation request. Our support team will check the order status and confirm the next steps.",
-        "return_request": "We understand you want to return your product. Our support team will review the return request and guide you through the next steps.",
-        "positive_feedback": "Thank you so much for your kind feedback! We are happy to hear that you are enjoying the product.",
-        "product_complaint": "We are sorry the product did not meet your expectations. Our support team will review the issue and help with the available next steps.",
+        "English": {
+            "product_inquiry": "Thanks for your interest. Our support team can help confirm the product details, price, and availability.",
+            "product_exchange": "We can help with your product exchange. Our support team will check the item and exchange eligibility, then guide you through the next steps.",
+            "refund_request": "We understand that you are waiting for your refund. Our support team will review the transaction and provide an update. Thank you for your patience.",
+            "delivery_issue": "We are sorry for the delivery delay. Our support team will check your order status and help you with the next steps.",
+            "payment_issue": "We understand your payment concern. Please do not make another payment while we review the transaction. Our support team will investigate.",
+            "account_support": "We are sorry you are having trouble with your account. Our support team will help you resolve the issue.",
+            "order_cancellation": "We received your order cancellation request. Our support team will check the order status and confirm the next steps.",
+            "return_request": "We understand you want to return your product. Our support team will review the return request and guide you through the next steps.",
+            "positive_feedback": "Thank you so much for your kind feedback! We are happy to hear that you are enjoying the product.",
+            "product_complaint": "We are sorry the product did not meet your expectations. Our support team will review the issue and help with the available next steps.",
+        },
+        "Tanglish": {
+            "product_inquiry": "Indha product-oda details, price, availability ellam enga support team confirm panni solluvanga.",
+            "product_exchange": "Unga exchange request-ku help pannuvom. Item-oda eligibility-ai support team check panni next steps solluvanga.",
+            "refund_request": "Unga refund request-ai enga support team review panni status update pannuvanga. Konjam wait pannunga.",
+            "delivery_issue": "Unga delivery delay-ku sorry. Order status-ai support team check panni next steps solluvanga.",
+            "payment_issue": "Unga payment issue-ku sorry. Review mudiyura varaikkum innoru payment panna vendam. Support team transaction-ai check pannuvanga.",
+            "account_support": "Unga account issue-ku sorry. Enga support team resolve panna help pannuvanga.",
+            "order_cancellation": "Unga cancellation request receive pannitom. Order status check panni next steps confirm pannuvanga.",
+            "return_request": "Unga return request-ai support team review panni next steps guide pannuvanga.",
+            "positive_feedback": "Nalla feedback kuduthadhukku romba nandri! Neenga product-ai enjoy panreenga-nu sandhosham.",
+            "product_complaint": "Product issue-ku sorry. Enga support team complaint-ai review panni available next steps-la help pannuvanga.",
+        },
+        "Hinglish": {
+            "product_inquiry": "Is product ki details, price aur availability hamari support team confirm karke bata degi.",
+            "product_exchange": "Hum aapki exchange request mein help karenge. Support team item ki eligibility check karke next steps batayegi.",
+            "refund_request": "Aapki refund request hamari support team review karegi aur status update degi. Kripya thoda intezaar karein.",
+            "delivery_issue": "Delivery delay ke liye humein khed hai. Support team aapke order ka status check karke next steps batayegi.",
+            "payment_issue": "Payment issue ke liye humein khed hai. Review hone tak please dobara payment na karein. Support team transaction check karegi.",
+            "account_support": "Account issue ke liye humein khed hai. Hamari support team aapki madad karegi.",
+            "order_cancellation": "Aapki cancellation request mil gayi hai. Support team order status check karke next steps confirm karegi.",
+            "return_request": "Aapki return request support team review karegi aur aapko next steps batayegi.",
+            "positive_feedback": "Aapke feedback ke liye bahut shukriya! Humein khushi hai ki aapko product pasand aaya.",
+            "product_complaint": "Product issue ke liye humein khed hai. Support team complaint review karke aapko available next steps batayegi.",
+        },
     }
-    return replies.get(intent, "Thank you for contacting support. Our team will review your request and assist you.")
+
+    language_replies = replies.get(style, replies["English"])
+    return language_replies.get(
+        intent,
+        "Thank you for contacting support. Our team will review your request and assist you."
+    ), style
 
 
 def pretty_label(value):
@@ -356,8 +506,65 @@ if analyze:
 
         st.markdown('<div class="section-title">Suggested customer reply</div>', unsafe_allow_html=True)
         st.markdown('<div class="section-sub">Review and edit this draft before sending it to a customer.</div>', unsafe_allow_html=True)
-        reply = get_suggested_reply(intent)
+        reply, reply_style = get_suggested_reply(intent, message)
+        st.caption(f"Reply style selected: {reply_style} (heuristic detection; please verify before sending).")
         st.text_area("Reply draft", value=reply, height=135, key="suggested_reply")
+
+        similar_examples = retrieve_similar_examples(message)
+        with st.expander("Similar labelled examples (few-shot retrieval)", expanded=True):
+            st.caption("Retrieved by TF-IDF similarity from a small labelled example bank. These examples support review; they do not override the classifier.")
+            for example_text, example_intent, similarity in similar_examples:
+                st.write(f"- “{example_text}” → **{pretty_label(example_intent)}** · similarity {similarity:.2f}")
+
+        # Save each submitted analysis to the local ticket history.
+        if st.session_state.get("last_saved_message") != (message, intent, urgency):
+            save_ticket(message, intent, urgency, intent_conf, urgency_conf,
+                        human_review, review_reasons, reply_style)
+            st.session_state["last_saved_message"] = (message, intent, urgency)
+
         st.caption("Prototype limitation: urgency rules and confidence scores are not validated reliability measures. Always review urgent and ambiguous messages carefully.")
+
+
+# ---------- Persistent queue dashboard ----------
+st.markdown("---")
+st.markdown('<div class="section-title">Support queue dashboard</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-sub">Counts are based on messages analyzed in this local app and saved to data/triage_history.csv.</div>', unsafe_allow_html=True)
+history = load_ticket_history()
+if not history:
+    st.info("No analyzed tickets saved yet. Analyze a customer message above to start building the queue.")
+else:
+    import pandas as pd
+    history_df = pd.DataFrame(history)
+    history_df["intent"] = history_df["intent"].fillna("unknown")
+    history_df["urgency"] = history_df["urgency"].fillna("unknown")
+    history_df["human_review"] = history_df["human_review"].astype(str).str.lower().isin(["true", "1", "yes"])
+
+    total_count = len(history_df)
+    high_count = int((history_df["urgency"].str.lower() == "high").sum())
+    review_count = int(history_df["human_review"].sum())
+    q1, q2, q3 = st.columns(3)
+    q1.metric("Analyzed tickets", total_count)
+    q2.metric("High urgency", high_count)
+    q3.metric("Human review", review_count)
+
+    left_chart, right_chart = st.columns(2)
+    with left_chart:
+        st.markdown("**Volume by intent**")
+        intent_counts = history_df["intent"].value_counts().rename_axis("Intent").reset_index(name="Tickets")
+        st.bar_chart(intent_counts.set_index("Intent"))
+    with right_chart:
+        st.markdown("**Volume by urgency**")
+        urgency_counts = history_df["urgency"].value_counts().rename_axis("Urgency").reset_index(name="Tickets")
+        st.bar_chart(urgency_counts.set_index("Urgency"))
+
+    st.markdown("**Recent queue items**")
+    display_cols = ["timestamp", "message", "intent", "urgency", "human_review", "review_reason"]
+    st.dataframe(history_df[display_cols].tail(20).iloc[::-1], use_container_width=True, hide_index=True)
+    st.download_button(
+        "Download ticket history CSV",
+        data=HISTORY_PATH.read_bytes(),
+        file_name="supportiq_ticket_history.csv",
+        mime="text/csv",
+    )
 
 st.markdown('<div class="footer">SUPPORTIQ · CODE-MIXED SUPPORT TRIAGE ASSISTANT &nbsp; • &nbsp; HUMAN-IN-THE-LOOP BY DESIGN</div>', unsafe_allow_html=True)
