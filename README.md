@@ -122,17 +122,11 @@ python -m unittest discover -s tests
 
 The evaluator reports intent accuracy, ML-only urgency accuracy, rule-assisted urgency accuracy, classification reports, and incorrect examples. Detailed per-message predictions are written to the local file `evaluation_results.csv`.
 
-### Baseline Evaluation Snapshot
+### Evaluation Results
 
-A prior local run using the 30-row `data/test_cases.csv` hold-out set reported:
+The repository includes an evaluator, but no verified metric values are published in this README. Run `python evaluate_model.py` locally and record the results from that run before presenting any accuracy or macro-F1 figures.
 
-| Metric | Result |
-|---|---:|
-| Intent accuracy | 86.67% |
-| ML-only urgency accuracy | 26.67% |
-| Rule-assisted urgency accuracy | 70.00% |
-
-These values are a small prototype snapshot, not a performance guarantee. The urgency labels include heuristics and the rules were iterated during development, so the rule-assisted score may be optimistic. The 30-row evaluation set covers delivery, refund, payment, and account-support examples rather than every intent category. Inspect per-class results and mistakes; do not change evaluation labels just to increase a score. Evaluate a fresh, independently labelled test set for a less biased estimate.
+The urgency labels include heuristics and the rules were iterated during development, so rule-assisted results may be optimistic. The 30-row evaluation set covers delivery, refund, payment, and account-support examples rather than every intent category. Inspect per-class results and mistakes; do not change evaluation labels just to increase a score. Evaluate a fresh, independently labelled test set for a less biased estimate.
 
 ## 8. Dataset Attribution and Licence
 
