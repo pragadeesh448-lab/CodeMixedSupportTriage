@@ -13,7 +13,9 @@ A prototype customer-support triage app for messages written in Tanglish, Hingli
 - `triage_rules.py` — shared rule-based urgency and ambiguous-delivery review logic used by the dashboard, smoke tests, and evaluation.
 - `test_model.py` — runs representative messages through the triage pipeline.
 - `evaluate_model.py` — reports ML-only and rule-assisted metrics separately on the held-out test CSV.
-- `data/support_tickets.csv` — 70 labelled training examples.
+- `data/support_tickets.csv` — original manually labelled training examples.
+- `data/codemixed_expanded.csv` — 240 synthetic, labelled English/Tanglish/Hinglish examples.
+- `data/bitext_mapped.csv` — generated locally from the official Bitext dataset by `prepare_bitext_data.py` (not committed).
 - `data/test_cases.csv` — 30 labelled evaluation examples.
 
 ## Run on Windows
@@ -29,7 +31,19 @@ python train_model.py
 streamlit run app.py
 ```
 
-The four `.joblib` model artifacts are generated locally by `train_model.py` and are intentionally not committed to GitHub. Run training once after installing the dependencies and whenever the training CSV or training code changes.
+The four `.joblib` model artifacts are generated locally by `train_model.py` and are intentionally not committed to GitHub. The training script combines the original examples and the code-mixed examples; it also includes `data/bitext_mapped.csv` if present. Character n-grams are included to help with spelling variation in romanized language, but they do not guarantee perfect Tanglish/Hinglish classification.
+
+### Prepare the official Bitext dataset
+
+The NexAI problem statement recommends `bitext/Bitext-customer-support-llm-chatbot-training-dataset` from Hugging Face (about 27,000 English request/response pairs). The PDF describes the source dataset; it does not contain the full dataset itself. Run:
+
+```powershell
+python -m pip install datasets
+python prepare_bitext_data.py
+python train_model.py
+```
+
+`prepare_bitext_data.py` maps supported Bitext intents to this app's smaller intent taxonomy. The source is English, not Tanglish/Hinglish. Its urgency labels are weak heuristic labels because the Bitext dataset does not provide the app's urgency labels. Keep this limitation in reports and evaluate on a separately labelled held-out code-mixed test set.
 
 If PowerShell blocks environment activation, use the current terminal's Python directly instead:
 ```powershell
