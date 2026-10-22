@@ -74,6 +74,8 @@ def get_suggested_reply(intent):
         "account_support": "We are sorry you are having trouble with your account. Our support team will help you resolve the issue.",
         "order_cancellation": "We received your order cancellation request. Our support team will check the order status and confirm the next steps.",
         "return_request": "We understand you want to return your product. Our support team will review the return request and guide you through the next steps.",
+        "positive_feedback": "Thank you so much for your kind feedback! We are happy to hear that you are enjoying the product.",
+        "product_complaint": "We are sorry the product did not meet your expectations. Our support team will review the issue and help with the available next steps.",
     }
     return replies.get(intent, "Thank you for contacting support. Our team will review your request and assist you.")
 
