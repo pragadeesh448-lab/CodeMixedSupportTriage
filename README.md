@@ -1,81 +1,176 @@
 # Code-Mixed Support Triage Assistant
 
-NEXAI Hack 2026 — Problem Statement 1.1
+**NEXAI Hack 2026 · Problem Statement 1.1 · Customer Service**
 
-## Overview
+## 1. Problem Statement
 
-A prototype customer-support triage app for messages written in Tanglish, Hinglish, or English. It predicts the support intent and urgency, shows model confidence, flags messages for human review, and suggests a reply draft.
+Indian customers often contact customer support using English mixed with Tamil written in Latin script (Tanglish) or Hindi written in Latin script (Hinglish). For example:
 
-## Project contents
+> "order vandhuchu but box damaged, refund venum"
 
-- `app.py` — Streamlit dashboard, intent model, urgency rules, review flag and suggested reply.
-- `train_model.py` — trains the TF-IDF / calibrated LinearSVC intent and urgency models.
-- `triage_rules.py` — shared rule-based urgency and ambiguous-delivery review logic used by the dashboard, smoke tests, and evaluation.
-- `test_model.py` — runs representative messages through the triage pipeline.
-- `evaluate_model.py` — reports ML-only and rule-assisted metrics separately on the held-out test CSV.
-- `data/support_tickets.csv` — original manually labelled training examples.
-- `data/codemixed_expanded.csv` — 240 synthetic, labelled English/Tanglish/Hinglish examples.
-- `data/bitext_mapped.csv` — generated locally from the official Bitext dataset by `prepare_bitext_data.py` (not committed).
-- `data/test_cases.csv` — 30 labelled evaluation examples.
+Manually reading each message, identifying the customer's issue and urgency, drafting a reply, and routing the ticket takes time. This project is a prototype that assists with those triage tasks and flags selected cases for human review.
 
-## Run on Windows
+## 2. Solution Overview
 
-Open PowerShell in this folder:
+The application accepts a message written in English, Tanglish, or Hinglish and provides:
+
+- **Intent classification** for supported customer-support categories such as refunds, returns, delivery, payments, accounts, and product issues.
+- **Urgency estimation** with low, medium, and high labels.
+- **Confidence estimates** from calibrated classifier probabilities.
+- **Rule-assisted checks** for selected high-risk payment/account signals and unclear delivery timelines.
+- **Human-review flags** with an explanatory reason for selected uncertain or high-priority cases.
+- **Suggested reply drafts** using prepared English, Tanglish, and Hinglish templates chosen by heuristic language-style detection.
+- **Similar-example retrieval** using TF-IDF and cosine similarity.
+- **Support dashboard** for reviewing ticket history and intent/urgency patterns.
+
+This is a prototype, not an autonomous helpdesk. Suggested replies should be reviewed before sending. The current code does not call an LLM API; it uses traditional machine learning, explicit rules, and reply templates.
+
+## 3. Architecture
+
+```mermaid
+flowchart TD
+    A[Customer message: English / Tanglish / Hinglish] --> B[Text feature extraction]
+    B --> C[Intent model: TF-IDF + calibrated LinearSVC]
+    B --> D[Urgency model: TF-IDF + calibrated LinearSVC]
+    C --> E[Rule-assisted urgency and review checks]
+    D --> E
+    A --> F[Heuristic language-style detection]
+    A --> G[TF-IDF cosine similarity retrieval]
+    E --> H[Intent, urgency, confidence and review reason]
+    F --> I[Suggested reply template]
+    H --> J[Streamlit triage inbox and dashboard]
+    I --> J
+    G --> J
+    J --> K[Local CSV ticket history]
+```
+
+## 4. Technology Stack
+
+| Technology | Purpose |
+|---|---|
+| Python | Application logic and model training |
+| Streamlit | Web application and dashboard UI |
+| scikit-learn | TF-IDF features, calibrated LinearSVC classifiers, cosine similarity, and evaluation metrics |
+| Pandas and NumPy | Data loading and numerical processing |
+| Joblib | Saving/loading trained models and label encoders |
+| Plotly | Dashboard charts |
+| Python regular expressions (`re`) | Phrase-based triage rules and language-style heuristics |
+| CSV | Training examples, held-out evaluation data, and local ticket history |
+| Hugging Face `datasets` | Downloading the recommended Bitext dataset |
+
+## 5. Repository Contents
+
+- `app.py` — Streamlit inbox, prediction results, reply suggestions, similar examples, ticket history, and dashboard.
+- `train_model.py` — trains the intent and urgency classifiers using word-level and character-level TF-IDF features with calibrated LinearSVC.
+- `triage_rules.py` — shared rule-based urgency and ambiguous-delivery review logic.
+- `test_model.py` — exercises representative messages through the triage pipeline.
+- `evaluate_model.py` — evaluates model outputs against `data/test_cases.csv` and writes per-message predictions to `evaluation_results.csv`.
+- `prepare_bitext_data.py` — downloads the Bitext dataset and maps supported intents to the application's intent taxonomy.
+- `requirements.txt` — required Python dependencies.
+- `Dockerfile.vercel` — experimental deployment configuration; it is not evidence of a verified public deployment.
+- `data/support_tickets.csv` — manually labelled project examples.
+- `data/codemixed_expanded.csv` — synthetic labelled English/Tanglish/Hinglish examples.
+- `data/test_cases.csv` — 30 labelled messages used by the current evaluation script.
+- `data/codemixed_test_set.csv` — additional team-written code-mixed cases; note that the current `evaluate_model.py` evaluates `data/test_cases.csv`, not this additional file.
+- `data/bitext_mapped.csv` — generated locally by `prepare_bitext_data.py`; not committed to the repository.
+- `*.joblib` — four model/label-encoder artifacts generated by `train_model.py`; not committed and must be regenerated locally.
+
+## 6. Setup and Execution (Windows)
+
+Install Python 3, then open PowerShell in the repository root.
 
 ```powershell
 py -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 python train_model.py
-streamlit run app.py
+python -m streamlit run app.py
 ```
 
-The four `.joblib` model artifacts are generated locally by `train_model.py` and are intentionally not committed to GitHub. The training script combines the original examples and the code-mixed examples; it also includes `data/bitext_mapped.csv` if present. Character n-grams are included to help with spelling variation in romanized language, but they do not guarantee perfect Tanglish/Hinglish classification.
+Open **http://localhost:8501** in your browser.
 
-### Prepare the official Bitext dataset
+If PowerShell blocks activation, run the install/train/run commands in a Python environment that already has the dependencies installed:
 
-The NexAI problem statement recommends `bitext/Bitext-customer-support-llm-chatbot-training-dataset` from Hugging Face (about 27,000 English request/response pairs). The PDF describes the source dataset; it does not contain the full dataset itself. Run:
-
-```powershell
-python -m pip install datasets
-python prepare_bitext_data.py
-python train_model.py
-```
-
-`prepare_bitext_data.py` maps supported Bitext intents to this app's smaller intent taxonomy. The source is English, not Tanglish/Hinglish. Its urgency labels are weak heuristic labels because the Bitext dataset does not provide the app's urgency labels. Keep this limitation in reports and evaluate on a separately labelled held-out code-mixed test set.
-
-If PowerShell blocks environment activation, use the current terminal's Python directly instead:
 ```powershell
 python -m pip install -r requirements.txt
 python train_model.py
 python -m streamlit run app.py
 ```
 
-## Evaluate
+The `.joblib` files are intentionally ignored by Git. Run `python train_model.py` after installing dependencies and before starting `app.py`.
 
-After training, run:
+### Optional: Prepare Bitext data
+
+The problem statement recommends the [Bitext Customer Support LLM Chatbot Training Dataset on Hugging Face](https://huggingface.co/datasets/bitext/Bitext-customer-support-llm-chatbot-training-dataset). To download and map the supported intents:
+
+```powershell
+python prepare_bitext_data.py
+python train_model.py
+```
+
+The preparation script writes `data/bitext_mapped.csv`. The training script uses that file only when it exists. The mapping script retains a subset of supported intents, not every original Bitext intent. It also creates heuristic urgency labels because the source dataset does not provide this application's urgency labels. Review the preprocessing for placeholders such as `{{Order Number}}` before treating the mapped data as fully cleaned.
+
+## 7. Evaluation
+
+After training the models, run:
+
 ```powershell
 python evaluate_model.py
 python -m unittest discover -s tests
 ```
 
-The evaluator prints ML-only intent/urgency accuracy and a separate rule-assisted urgency accuracy, then saves per-message predictions to `evaluation_results.csv`. The results file is generated locally and should be reviewed before sharing.
+The evaluator reports intent accuracy, ML-only urgency accuracy, rule-assisted urgency accuracy, classification reports, and incorrect examples. Detailed per-message predictions are written to the local file `evaluation_results.csv`.
 
-## Current limitations
+### Baseline Evaluation Snapshot
 
-- The training set is small and manually labelled; test-set size is only 30 examples, so metrics are noisy.
-- Confidence scores come from the calibrated model, not from the rule layer. A rule-selected urgency is not itself a calibrated probability.
-- The 30 held-out examples currently cover delivery, refund, payment, and account support; they do not test every intent class.
-- Rule-assisted metrics can look better or worse depending on labelled examples. Do not treat rules as proof of generalization; inspect per-class reports and incorrect predictions.
-- Suggested replies are drafts. A support agent must review them before sending.
+A prior local run using the 30-row `data/test_cases.csv` hold-out set reported:
 
+| Metric | Result |
+|---|---:|
+| Intent accuracy | 86.67% |
+| ML-only urgency accuracy | 26.67% |
+| Rule-assisted urgency accuracy | 70.00% |
 
-## Urgency evaluation notes
+These values are a small prototype snapshot, not a performance guarantee. The urgency labels include heuristics and the rules were iterated during development, so the rule-assisted score may be optimistic. The 30-row evaluation set covers delivery, refund, payment, and account-support examples rather than every intent category. Inspect per-class results and mistakes; do not change evaluation labels just to increase a score. Evaluate a fresh, independently labelled test set for a less biased estimate.
 
-The evaluator reports the raw ML urgency estimate separately from the rule-assisted final urgency, using the same shared rules as the app. The small unit-test suite checks high-risk payment/refund/account signals, routine low-urgency requests, and ambiguous delivery review. This distinction matters because the probability/confidence displayed in the UI still comes from the ML model and is not a calibrated confidence score for a rule override. Review each misclassified row and keep test labels independent of model changes; do not change test labels just to raise the score.
+## 8. Dataset Attribution and Licence
 
+**Bitext Customer Support Dataset**
 
-## Baseline evaluation snapshot
+- Dataset: [bitext/Bitext-customer-support-llm-chatbot-training-dataset](https://huggingface.co/datasets/bitext/Bitext-customer-support-llm-chatbot-training-dataset)
+- Publisher: Bitext.
+- Licence listed on the dataset card: **CDLA-Sharing-1.0**. Read the [dataset card](https://huggingface.co/datasets/bitext/Bitext-customer-support-llm-chatbot-training-dataset) and comply with its terms before redistributing source data.
+- The source dataset contains synthetic English customer-support request/response pairs and intent labels. It is not a Tanglish/Hinglish dataset.
+- This project maps a subset of source intents to a smaller taxonomy. The generated urgency values are weak heuristic labels, not human-provided ground truth.
 
-A local run of the current code and 30-row hold-out CSV reported **86.67% intent accuracy**, **26.67% ML-only urgency accuracy**, and **70.00% rule-assisted urgency accuracy**. This is one small prototype evaluation, not a guarantee of performance on future tickets. The rule-assisted score may be optimistic because rules were developed during iteration against these example messages; use a fresh, separately labelled test set for a less biased estimate.
+The manually written examples in `support_tickets.csv`, `codemixed_expanded.csv`, and the held-out test files are separate project data. Keep training examples separate from evaluation messages and any similarity/few-shot example bank.
+
+## 9. Deployment URL / Approved Local Demo
+
+**Local demo:** Run the commands in [Setup and Execution](#6-setup-and-execution-windows), then open **http://localhost:8501**.
+
+A public deployment URL is not listed because a successful end-to-end cloud deployment of the Python Streamlit application has not yet been verified. `Dockerfile.vercel` is experimental configuration only; do not treat it as a live URL or a confirmed deployment.
+
+## 10. Team Members
+
+| Team member | Details |
+|---|---|
+| Pragadeesh Kumar | Project owner / maintainer — [GitHub profile](https://github.com/pragadeesh448-lab) |
+
+Add the actual names, identifiers (if required by the event), and responsibilities of any additional teammates before final submission. Do not leave unverified placeholders in the submitted README.
+
+## 11. Limitations and Responsible Use
+
+- Bitext is synthetic English data and does not represent every real-world Indian code-mixed message.
+- The supported-intent mapping is a subset of the original dataset; urgency labels generated by the preparation script are heuristic.
+- Review preprocessing for dataset placeholders before relying on mapped examples.
+- Calibrated classifier scores are estimates, not guarantees of correctness; they do not automatically validate a rule override.
+- Language-style detection is heuristic and may select the wrong reply style for mixed messages.
+- Human-review flags are decision-support signals, not a guarantee that every incorrect prediction will be escalated.
+- Replies are drafts and must be checked by a person before being sent.
+- Ticket history is saved to local CSV storage; persistent multi-user storage and integration with a real customer-support platform are not implemented.
+
+## Development Log
+
+A separate `DEV_LOG.md` is not currently maintained. See the [GitHub commit history](https://github.com/pragadeesh448-lab/CodeMixedSupportTriage/commits/master) for recorded code changes.
